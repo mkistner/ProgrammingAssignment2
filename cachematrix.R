@@ -1,15 +1,39 @@
-## Put comments here that give an overall description of what your
-## functions do
+## This file contains functions for faster matrix inverion by
+## making use cached values for inverses, where possible
 
-## Write a short comment describing this function
+## makeCacheMatrix creates a special "matrix" object that can
+## cache its inverse
 
 makeCacheMatrix <- function(x = matrix()) {
-
+  stored_inv <- NULL
+  get <- function() {
+    x
+  }
+  setInverse <- function(new_inv) {
+    stored_inv <<- new_inv
+  }
+  getInverse <- function() {
+    stored_inv
+  }
+  list(get = get,
+       setInverse = setInverse,
+       getInverse = getInverse)
 }
 
 
-## Write a short comment describing this function
+## cacheSolve computes the inverse of the special "matrix" x
+## returned by makeCacheMatrix
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+  stored_inv <- x$getInverse()
+  if(is.null(stored_inv)) {
+    data <- x$get()
+    new_inv <- solve(data, ...) # calculate the inverse
+    x$setInverse(new_inv)
+    stored_inv <- new_inv
+  }
+  else {
+    message("Getting cached data...")
+  }
+  return(stored_inv)
 }
